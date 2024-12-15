@@ -4,14 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from '@tanstack/react-query';
 import { Activity, MessageSquare, Package } from 'lucide-react';
-
-const fetchOrders = async () => {
-  // Mock API call
-  return [
-    { id: 1, status: 'pending', items: ['Glazed Donut', 'Chocolate Donut'], timestamp: new Date().toISOString() },
-    { id: 2, status: 'completed', items: ['Strawberry Donut'], timestamp: new Date().toISOString() },
-  ];
-};
+import { Comments } from './Comments';
+import { ActivityList } from './ActivityList';
 
 const fetchAnalytics = async () => {
   // Mock API call
@@ -22,30 +16,12 @@ const fetchAnalytics = async () => {
   };
 };
 
-const fetchVoiceLogs = async () => {
-  // Mock API call
-  return [
-    { id: 1, transcript: "I'd like to order a dozen glazed donuts", timestamp: new Date().toISOString() },
-    { id: 2, transcript: "Can I get a chocolate donut?", timestamp: new Date().toISOString() },
-  ];
-};
-
 export function Dashboard() {
-  const [activeTab, setActiveTab] = useState('orders');
-
-  const { data: orders, isLoading: ordersLoading } = useQuery({
-    queryKey: ['orders'],
-    queryFn: fetchOrders,
-  });
+  const [activeTab, setActiveTab] = useState('activity');
 
   const { data: analytics, isLoading: analyticsLoading } = useQuery({
     queryKey: ['analytics'],
     queryFn: fetchAnalytics,
-  });
-
-  const { data: voiceLogs, isLoading: logsLoading } = useQuery({
-    queryKey: ['voiceLogs'],
-    queryFn: fetchVoiceLogs,
   });
 
   return (
@@ -84,48 +60,19 @@ export function Dashboard() {
         </Card>
       </div>
 
-      <Tabs defaultValue="orders" className="space-y-6">
+      <Tabs defaultValue="activity" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="orders">Orders</TabsTrigger>
-          <TabsTrigger value="voice-logs">Voice Logs</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsTrigger value="comments">Comments</TabsTrigger>
           <TabsTrigger value="endpoints">API Endpoints</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="orders" className="space-y-4">
-          {ordersLoading ? (
-            <Card className="p-6 shimmer">
-              <div className="h-20 bg-muted rounded-md"></div>
-            </Card>
-          ) : (
-            orders?.map((order) => (
-              <Card key={order.id} className="p-6 card-hover">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="font-semibold">Order #{order.id}</h3>
-                    <p className="text-sm text-muted-foreground">{order.items.join(', ')}</p>
-                  </div>
-                  <Button variant="outline">{order.status}</Button>
-                </div>
-              </Card>
-            ))
-          )}
+        <TabsContent value="activity">
+          <ActivityList />
         </TabsContent>
 
-        <TabsContent value="voice-logs" className="space-y-4">
-          {logsLoading ? (
-            <Card className="p-6 shimmer">
-              <div className="h-20 bg-muted rounded-md"></div>
-            </Card>
-          ) : (
-            voiceLogs?.map((log) => (
-              <Card key={log.id} className="p-6 card-hover">
-                <p className="text-sm text-muted-foreground mb-2">
-                  {new Date(log.timestamp).toLocaleString()}
-                </p>
-                <p className="font-medium">{log.transcript}</p>
-              </Card>
-            ))
-          )}
+        <TabsContent value="comments">
+          <Comments />
         </TabsContent>
 
         <TabsContent value="endpoints" className="space-y-4">
@@ -133,16 +80,16 @@ export function Dashboard() {
             <h3 className="font-semibold mb-4">Available Endpoints</h3>
             <div className="space-y-4">
               <div className="p-4 bg-muted rounded-md">
-                <p className="font-mono text-sm">POST /api/orders</p>
-                <p className="text-sm text-muted-foreground mt-2">Create a new order</p>
+                <p className="font-mono text-sm">GET /api/comments</p>
+                <p className="text-sm text-muted-foreground mt-2">Fetch comments</p>
               </div>
               <div className="p-4 bg-muted rounded-md">
-                <p className="font-mono text-sm">GET /api/analytics</p>
-                <p className="text-sm text-muted-foreground mt-2">Retrieve analytics data</p>
+                <p className="font-mono text-sm">GET /api/activity</p>
+                <p className="text-sm text-muted-foreground mt-2">Fetch activity logs</p>
               </div>
               <div className="p-4 bg-muted rounded-md">
-                <p className="font-mono text-sm">GET /api/voice-logs</p>
-                <p className="text-sm text-muted-foreground mt-2">Fetch voice interaction logs</p>
+                <p className="font-mono text-sm">POST /api/comments</p>
+                <p className="text-sm text-muted-foreground mt-2">Create a new comment</p>
               </div>
             </div>
           </Card>
