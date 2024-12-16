@@ -3,9 +3,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from '@tanstack/react-query';
-import { Activity, MessageSquare, Package } from 'lucide-react';
+import { Activity, MessageSquare, Package, ArrowLeft } from 'lucide-react';
 import { Comments } from './Comments';
 import { ActivityList } from './ActivityList';
+import { Link } from 'react-router-dom';
 
 const fetchAnalytics = async () => {
   // Mock API call
@@ -26,7 +27,15 @@ export function Dashboard() {
 
   return (
     <div className="container mx-auto py-8 px-4 animate-fadeIn">
-      <h1 className="text-4xl font-display font-bold mb-8">Sandbox Dashboard</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-4xl font-display font-bold">Sandbox Dashboard</h1>
+        <Link to="/">
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Button>
+        </Link>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="p-6 card-hover">
