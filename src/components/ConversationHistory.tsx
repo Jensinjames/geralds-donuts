@@ -2,9 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
+import { useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 export function ConversationHistory() {
-  const { data: conversations, isLoading } = useQuery({
+  const { toast } = useToast();
+  const { data: conversations, isLoading, refetch } = useQuery({
     queryKey: ['conversations'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -16,6 +19,34 @@ export function ConversationHistory() {
       return data;
     },
   });
+
+  useEffect(() => {
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'conversation_history'
+        },
+        (payload) => {
+          console.log('New conversation:', payload);
+          toast({
+            title: "New Conversation",
+            description: "A new conversation has been added",
+          });
+          refetch(); // Refresh the conversation list
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch, toast]);
 
   if (isLoading) {
     return (
