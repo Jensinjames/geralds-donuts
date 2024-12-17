@@ -60,6 +60,27 @@ export type Database = {
         }
         Relationships: []
       }
+      conversational_history: {
+        Row: {
+          created_at: string
+          id: number
+          message: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          message: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          message?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           bio: string | null
