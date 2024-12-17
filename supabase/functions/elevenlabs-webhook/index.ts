@@ -7,7 +7,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -15,12 +14,43 @@ serve(async (req) => {
   try {
     console.log('Webhook received:', req.method);
     
-    // Test endpoint with a GET request
-    if (req.method === 'GET') {
+    if (req.method === 'POST') {
+      const supabaseClient = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      );
+
+      const payload = await req.json();
+      console.log('Received webhook payload:', payload);
+
+      // Extract conversation ID from the ElevenLabs URL
+      const conversationId = payload.url ? 
+        payload.url.split('history/').pop() : 
+        'unknown';
+
+      const { data, error } = await supabaseClient
+        .from('conversation_history')
+        .insert({
+          conversation_id: conversationId,
+          user_message: payload.input || '',
+          agent_response: payload.output || '',
+          metadata: {
+            url: payload.url,
+            session_id: payload.metadata?.session_id,
+            model_id: payload.metadata?.model_id,
+            char_count: payload.metadata?.char_count,
+            timestamp: payload.metadata?.timestamp || new Date().toISOString()
+          }
+        });
+
+      if (error) throw error;
+
+      console.log('Successfully stored conversation:', data);
       return new Response(
         JSON.stringify({ 
           status: 'success',
-          message: 'Webhook endpoint is working!' 
+          message: 'Conversation data stored successfully',
+          data 
         }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -29,70 +59,6 @@ serve(async (req) => {
       );
     }
 
-    // Handle POST requests
-    if (req.method === 'POST') {
-      const supabaseClient = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-      );
-
-      let payload;
-      try {
-        payload = await req.json();
-        console.log('Received webhook payload:', payload);
-
-        // Extract conversation ID from the ElevenLabs URL if present
-        let conversationId = payload.conversation_id;
-        if (payload.url && payload.url.includes('history/')) {
-          conversationId = payload.url.split('history/').pop();
-        }
-
-        // Insert the conversation data into Supabase
-        const { data, error } = await supabaseClient
-          .from('conversation_history')
-          .insert({
-            conversation_id: conversationId || 'default',
-            user_message: payload.user_message || payload.input || '',
-            agent_response: payload.agent_response || payload.output || '',
-            metadata: {
-              url: payload.url,
-              ...payload.metadata
-            },
-            timestamp: new Date().toISOString()
-          });
-
-        if (error) throw error;
-
-        console.log('Successfully inserted conversation:', data);
-        return new Response(
-          JSON.stringify({ 
-            status: 'success',
-            message: 'Conversation data stored successfully',
-            data 
-          }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 200 
-          }
-        );
-
-      } catch (error) {
-        console.error('Error processing payload:', error);
-        return new Response(
-          JSON.stringify({ 
-            status: 'error',
-            message: 'Failed to process payload',
-            error: error.message 
-          }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 400 
-          }
-        );
-      }
-    }
-
-    // Handle unsupported methods
     return new Response(
       JSON.stringify({ 
         status: 'error',

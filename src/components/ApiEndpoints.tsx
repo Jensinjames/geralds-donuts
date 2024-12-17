@@ -14,12 +14,8 @@ export function ApiEndpoints() {
           <p className="text-sm text-muted-foreground mt-2">Webhook endpoint for ElevenLabs conversation history</p>
         </div>
         <div className="p-4 bg-muted rounded-md">
-          <p className="font-mono text-sm">GET /api/comments</p>
-          <p className="text-sm text-muted-foreground mt-2">Fetch comments</p>
-        </div>
-        <div className="p-4 bg-muted rounded-md">
-          <p className="font-mono text-sm">GET /api/activity</p>
-          <p className="text-sm text-muted-foreground mt-2">Fetch activity logs</p>
+          <p className="font-mono text-sm">GET /functions/get-elevenlabs-url</p>
+          <p className="text-sm text-muted-foreground mt-2">Get signed URL for ElevenLabs conversation</p>
         </div>
       </div>
     </Card>
