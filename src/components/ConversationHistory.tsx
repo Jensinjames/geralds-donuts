@@ -7,15 +7,21 @@ import { useToast } from "@/components/ui/use-toast";
 
 export function ConversationHistory() {
   const { toast } = useToast();
-  const { data: conversations, isLoading, refetch } = useQuery({
+  const { data: conversations, isLoading, error } = useQuery({
     queryKey: ['conversations'],
     queryFn: async () => {
+      console.log('Fetching conversations...');
       const { data, error } = await supabase
         .from('conversation_history')
         .select('*')
         .order('timestamp', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Fetched conversations:', data);
       return data;
     },
   });
@@ -37,21 +43,38 @@ export function ConversationHistory() {
             title: "New Conversation",
             description: "A new conversation has been added",
           });
-          refetch(); // Refresh the conversation list
         }
       )
       .subscribe();
 
-    // Cleanup subscription on unmount
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [refetch, toast]);
+  }, [toast]);
+
+  if (error) {
+    console.error('Query error:', error);
+    return (
+      <div className="p-4 text-red-500">
+        Error loading conversations. Please check the console for details.
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
       <Card className="p-6 shimmer">
         <div className="h-20 bg-muted rounded-md"></div>
+      </Card>
+    );
+  }
+
+  if (!conversations || conversations.length === 0) {
+    return (
+      <Card className="p-6">
+        <p className="text-center text-muted-foreground">
+          No conversations found. Start a voice chat to create some!
+        </p>
       </Card>
     );
   }

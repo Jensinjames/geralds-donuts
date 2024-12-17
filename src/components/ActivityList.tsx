@@ -4,24 +4,49 @@ import { Card } from "@/components/ui/card";
 import { Activity } from "lucide-react";
 
 export function ActivityList() {
-  const { data: activities, isLoading } = useQuery({
+  const { data: activities, isLoading, error } = useQuery({
     queryKey: ['activities'],
     queryFn: async () => {
+      console.log('Fetching activities...');
       const { data, error } = await supabase
         .from('Activity')
         .select('*')
         .order('Timestamp', { ascending: false })
         .limit(10);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Fetched activities:', data);
       return data;
     },
   });
+
+  if (error) {
+    console.error('Query error:', error);
+    return (
+      <div className="p-4 text-red-500">
+        Error loading activities. Please check the console for details.
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
       <Card className="p-6 shimmer">
         <div className="h-20 bg-muted rounded-md"></div>
+      </Card>
+    );
+  }
+
+  if (!activities || activities.length === 0) {
+    return (
+      <Card className="p-6">
+        <p className="text-center text-muted-foreground">
+          No activities found yet.
+        </p>
       </Card>
     );
   }
