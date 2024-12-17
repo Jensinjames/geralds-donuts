@@ -39,12 +39,140 @@ export type Database = {
         }
         Relationships: []
       }
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      conversation_history: {
+        Row: {
+          agent_response: string
+          conversation_id: string
+          id: string
+          metadata: Json | null
+          timestamp: string | null
+          user_message: string
+        }
+        Insert: {
+          agent_response: string
+          conversation_id: string
+          id?: string
+          metadata?: Json | null
+          timestamp?: string | null
+          user_message: string
+        }
+        Update: {
+          agent_response?: string
+          conversation_id?: string
+          id?: string
+          metadata?: Json | null
+          timestamp?: string | null
+          user_message?: string
+        }
+        Relationships: []
+      }
+      conversational_history: {
+        Row: {
+          created_at: string
+          id: number
+          message: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          message: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          message?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          id: number
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: never
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: never
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      count_total_users: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      get_active_and_max_connections: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          active_connections: number
+          max_connections: number
+        }[]
+      }
+      get_user_profile: {
+        Args: {
+          user_id: number
+        }
+        Returns: {
+          id: number
+          username: string
+          email: string
+          created_at: string
+        }[]
+      }
+      sms_authenticate_user: {
+        Args: {
+          phone_number: string
+          shortcode: string
+        }
+        Returns: string
+      }
+      update_user_email: {
+        Args: {
+          user_id: number
+          new_email: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
