@@ -23,7 +23,7 @@ export function VoiceChat() {
     onError: (error) => {
       toast({
         title: "Error",
-        description: error.message,
+        description: error, // Changed from error.message to error
         variant: "destructive",
       });
     },
@@ -67,7 +67,7 @@ export function VoiceChat() {
       }
 
       const data = await response.json();
-      await conversation.startSession({ url: data.signed_url });
+      await conversation.startSession({ signedUrl: data.signed_url }); // Changed from url to signedUrl
     } catch (error) {
       toast({
         title: "Error",
