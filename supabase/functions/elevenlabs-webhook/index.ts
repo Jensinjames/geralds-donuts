@@ -40,72 +40,56 @@ serve(async (req) => {
       try {
         payload = await req.json();
         console.log('Received webhook payload:', payload);
+
+        // Extract conversation ID from the ElevenLabs URL if present
+        let conversationId = payload.conversation_id;
+        if (payload.url && payload.url.includes('history/')) {
+          conversationId = payload.url.split('history/').pop();
+        }
+
+        // Insert the conversation data into Supabase
+        const { data, error } = await supabaseClient
+          .from('conversation_history')
+          .insert({
+            conversation_id: conversationId || 'default',
+            user_message: payload.user_message || payload.input || '',
+            agent_response: payload.agent_response || payload.output || '',
+            metadata: {
+              url: payload.url,
+              ...payload.metadata
+            },
+            timestamp: new Date().toISOString()
+          });
+
+        if (error) throw error;
+
+        console.log('Successfully inserted conversation:', data);
+        return new Response(
+          JSON.stringify({ 
+            status: 'success',
+            message: 'Conversation data stored successfully',
+            data 
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200 
+          }
+        );
+
       } catch (error) {
-        console.error('Error parsing JSON payload:', error);
+        console.error('Error processing payload:', error);
         return new Response(
           JSON.stringify({ 
             status: 'error',
-            message: 'Invalid JSON payload' 
-          }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 400 
-          }
-        );
-      }
-
-      // Validate required fields
-      if (!payload.conversation_id || !payload.user_message || !payload.agent_response) {
-        return new Response(
-          JSON.stringify({ 
-            status: 'error',
-            message: 'Missing required fields' 
-          }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 400 
-          }
-        );
-      }
-
-      // Insert the conversation data into Supabase
-      const { data, error } = await supabaseClient
-        .from('conversation_history')
-        .insert({
-          conversation_id: payload.conversation_id,
-          user_message: payload.user_message,
-          agent_response: payload.agent_response,
-          metadata: payload.metadata || {},
-          timestamp: new Date().toISOString()
-        });
-
-      if (error) {
-        console.error('Error inserting data:', error);
-        return new Response(
-          JSON.stringify({ 
-            status: 'error',
-            message: 'Failed to insert data',
+            message: 'Failed to process payload',
             error: error.message 
           }),
           { 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 500 
+            status: 400 
           }
         );
       }
-
-      console.log('Successfully inserted conversation:', data);
-      return new Response(
-        JSON.stringify({ 
-          status: 'success',
-          message: 'Conversation data stored successfully',
-          data 
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200 
-        }
-      );
     }
 
     // Handle unsupported methods
