@@ -132,6 +132,27 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_codes: {
+        Row: {
+          created_at: string | null
+          id: number
+          phone_number: string
+          verification_code: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: never
+          phone_number: string
+          verification_code: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: never
+          phone_number?: string
+          verification_code?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
