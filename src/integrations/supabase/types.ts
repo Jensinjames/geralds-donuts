@@ -137,12 +137,34 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_total_users: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       get_active_and_max_connections: {
         Args: Record<PropertyKey, never>
         Returns: {
           active_connections: number
           max_connections: number
         }[]
+      }
+      get_user_profile: {
+        Args: {
+          user_id: number
+        }
+        Returns: {
+          id: number
+          username: string
+          email: string
+          created_at: string
+        }[]
+      }
+      update_user_email: {
+        Args: {
+          user_id: number
+          new_email: string
+        }
+        Returns: undefined
       }
     }
     Enums: {

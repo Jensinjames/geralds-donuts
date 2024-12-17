@@ -9,8 +9,7 @@ export function useActivities() {
       const { data, error } = await supabase
         .from('Activity')
         .select('*')
-        .order('Timestamp', { ascending: false })
-        .limit(10);
+        .order('Timestamp', { ascending: false });
       
       if (error) {
         console.error('Supabase error:', error);
@@ -20,7 +19,7 @@ export function useActivities() {
       console.log('Fetched activities:', data);
       return data;
     },
-    staleTime: 1000 * 60, // Consider data fresh for 1 minute
-    gcTime: 1000 * 60 * 5, // Keep unused data in cache for 5 minutes
+    staleTime: 1000 * 60, // 1 minute
+    gcTime: 1000 * 60 * 5, // 5 minutes
   });
 }

@@ -7,10 +7,26 @@ export const ApiTest = () => {
 
   const testWebhook = async () => {
     try {
+      // First, log the activity
+      const { error: activityError } = await supabase
+        .from('Activity')
+        .insert({
+          ID: crypto.randomUUID(),
+          Timestamp: new Date().toISOString(),
+          User: 'test-user',
+          Action: 'TEST_WEBHOOK',
+          Details: { test: true },
+          Status: 'success',
+          Source: 'api-test'
+        });
+
+      if (activityError) throw activityError;
+
+      // Then test the webhook
       const { data: postResponse, error: postError } = await supabase.functions.invoke('elevenlabs-webhook', {
         method: 'POST',
         body: {
-          url: "https://api.elevenlabs.io/v1/history/123",
+          url: "https://api.elevenlabs.io/v1/history/test-123",
           input: "What's the weather like?",
           output: "The weather is sunny today.",
           metadata: {
@@ -26,13 +42,13 @@ export const ApiTest = () => {
       console.log('Webhook response:', postResponse);
 
       toast({
-        title: "Webhook Test Successful",
-        description: "Check the console for response data",
+        title: "Test Successful",
+        description: "Activity logged and webhook tested successfully",
       });
     } catch (error) {
-      console.error('Webhook test error:', error);
+      console.error('Test error:', error);
       toast({
-        title: "Webhook Test Failed",
+        title: "Test Failed",
         description: error.message,
         variant: "destructive"
       });
@@ -41,7 +57,7 @@ export const ApiTest = () => {
 
   return (
     <Button onClick={testWebhook} variant="outline">
-      Test Webhook
+      Test API Integration
     </Button>
   );
 };

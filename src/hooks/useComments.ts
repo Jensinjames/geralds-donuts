@@ -10,8 +10,14 @@ export function useComments() {
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
       return data;
     },
+    staleTime: 1000 * 60,
+    gcTime: 1000 * 60 * 5,
   });
 }
