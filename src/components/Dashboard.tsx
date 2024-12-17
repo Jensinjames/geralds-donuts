@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Activity, MessageSquare, Package, ArrowLeft } from 'lucide-react';
 import { Comments } from './Comments';
 import { ActivityList } from './ActivityList';
+import { ConversationHistory } from './ConversationHistory';
 import { Link } from 'react-router-dom';
 
 const fetchAnalytics = async () => {
@@ -72,12 +73,17 @@ export function Dashboard() {
       <Tabs defaultValue="activity" className="space-y-6">
         <TabsList>
           <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsTrigger value="conversations">Conversations</TabsTrigger>
           <TabsTrigger value="comments">Comments</TabsTrigger>
           <TabsTrigger value="endpoints">API Endpoints</TabsTrigger>
         </TabsList>
 
         <TabsContent value="activity">
           <ActivityList />
+        </TabsContent>
+
+        <TabsContent value="conversations">
+          <ConversationHistory />
         </TabsContent>
 
         <TabsContent value="comments">
@@ -89,16 +95,16 @@ export function Dashboard() {
             <h3 className="font-semibold mb-4">Available Endpoints</h3>
             <div className="space-y-4">
               <div className="p-4 bg-muted rounded-md">
+                <p className="font-mono text-sm">POST /functions/elevenlabs-webhook</p>
+                <p className="text-sm text-muted-foreground mt-2">Webhook endpoint for ElevenLabs conversation history</p>
+              </div>
+              <div className="p-4 bg-muted rounded-md">
                 <p className="font-mono text-sm">GET /api/comments</p>
                 <p className="text-sm text-muted-foreground mt-2">Fetch comments</p>
               </div>
               <div className="p-4 bg-muted rounded-md">
                 <p className="font-mono text-sm">GET /api/activity</p>
                 <p className="text-sm text-muted-foreground mt-2">Fetch activity logs</p>
-              </div>
-              <div className="p-4 bg-muted rounded-md">
-                <p className="font-mono text-sm">POST /api/comments</p>
-                <p className="text-sm text-muted-foreground mt-2">Create a new comment</p>
               </div>
             </div>
           </Card>

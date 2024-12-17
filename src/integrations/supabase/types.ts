@@ -60,6 +60,33 @@ export type Database = {
         }
         Relationships: []
       }
+      conversation_history: {
+        Row: {
+          agent_response: string
+          conversation_id: string
+          id: string
+          metadata: Json | null
+          timestamp: string | null
+          user_message: string
+        }
+        Insert: {
+          agent_response: string
+          conversation_id: string
+          id?: string
+          metadata?: Json | null
+          timestamp?: string | null
+          user_message: string
+        }
+        Update: {
+          agent_response?: string
+          conversation_id?: string
+          id?: string
+          metadata?: Json | null
+          timestamp?: string | null
+          user_message?: string
+        }
+        Relationships: []
+      }
       conversational_history: {
         Row: {
           created_at: string
