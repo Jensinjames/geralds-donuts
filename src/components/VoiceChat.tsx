@@ -20,18 +20,45 @@ export function VoiceChat() {
       // Create and append the new widget
       const widget = document.createElement('elevenlabs-convai');
       widget.setAttribute('agent-id', 'KhGDINYSBcAFlPxBCRom');
+      widget.setAttribute('style', 'width: 100%; height: 400px;');
       
       if (containerRef.current) {
         containerRef.current.appendChild(widget);
         widgetInitialized.current = true;
         console.log('ElevenLabs widget initialized');
         
-        // Add event listener for widget load
+        // Add event listeners for widget events
         widget.addEventListener('load', () => {
           console.log('ElevenLabs widget loaded successfully');
           toast({
             title: "Voice Chat Ready",
-            description: "The voice chat widget has been initialized",
+            description: "Click the microphone icon to start chatting",
+          });
+        });
+
+        widget.addEventListener('error', (error) => {
+          console.error('ElevenLabs widget error:', error);
+          toast({
+            title: "Error",
+            description: "Failed to connect to voice chat service",
+            variant: "destructive",
+          });
+        });
+
+        widget.addEventListener('connect', () => {
+          console.log('ElevenLabs widget connected');
+          toast({
+            title: "Connected",
+            description: "Voice chat service connected successfully",
+          });
+        });
+
+        widget.addEventListener('disconnect', () => {
+          console.log('ElevenLabs widget disconnected');
+          toast({
+            title: "Disconnected",
+            description: "Voice chat service disconnected",
+            variant: "destructive",
           });
         });
       }
@@ -77,7 +104,7 @@ export function VoiceChat() {
   return (
     <Card className="p-6">
       <h2 className="text-2xl font-bold mb-4">Voice Chat</h2>
-      <div ref={containerRef} className="min-h-[400px]"></div>
+      <div ref={containerRef} className="min-h-[400px] flex items-center justify-center"></div>
     </Card>
   );
 }
