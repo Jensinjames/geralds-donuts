@@ -2,11 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
 export function ConversationHistory() {
   const { toast } = useToast();
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
   const { data: conversations, isLoading, error } = useQuery({
     queryKey: ['conversations'],
     queryFn: async () => {
@@ -24,11 +26,18 @@ export function ConversationHistory() {
       console.log('Fetched conversations:', data);
       return data;
     },
+    staleTime: 1000 * 60, // Consider data fresh for 1 minute
+    cacheTime: 1000 * 60 * 5, // Keep unused data in cache for 5 minutes
   });
 
   useEffect(() => {
-    // Subscribe to real-time updates
-    const channel = supabase
+    // Clean up previous subscription if it exists
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+    }
+
+    // Create new subscription
+    channelRef.current = supabase
       .channel('schema-db-changes')
       .on(
         'postgres_changes',
@@ -48,7 +57,9 @@ export function ConversationHistory() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
     };
   }, [toast]);
 
