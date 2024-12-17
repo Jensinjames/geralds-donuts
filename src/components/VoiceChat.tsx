@@ -23,7 +23,7 @@ export function VoiceChat() {
     onError: (error) => {
       toast({
         title: "Error",
-        description: error, // Changed from error.message to error
+        description: error,
         variant: "destructive",
       });
     },
@@ -52,23 +52,15 @@ export function VoiceChat() {
 
   const startChat = async () => {
     try {
-      // Get signed URL from ElevenLabs API
-      const response = await fetch(
-        "https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=f5VcNFddXJbBfZz1xvA8",
-        {
-          headers: {
-            "xi-api-key": process.env.ELEVENLABS_API_KEY || "",
-          },
-        }
-      );
+      // Get signed URL from our Edge Function
+      const { data, error } = await supabase.functions.invoke('get-signed-url');
+      
+      if (error) throw error;
+      if (!data.signedUrl) throw new Error('No signed URL received');
 
-      if (!response.ok) {
-        throw new Error("Failed to get signed URL");
-      }
-
-      const data = await response.json();
-      await conversation.startSession({ signedUrl: data.signed_url }); // Changed from url to signedUrl
+      await conversation.startSession({ signedUrl: data.signedUrl });
     } catch (error) {
+      console.error('Error starting chat:', error);
       toast({
         title: "Error",
         description: "Failed to start voice chat",
