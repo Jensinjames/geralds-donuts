@@ -134,22 +134,31 @@ export type Database = {
       }
       verification_codes: {
         Row: {
+          attempts: number | null
           created_at: string | null
-          id: number
+          expires_at: string | null
+          id: string
           phone_number: string
           verification_code: string
+          verified: boolean | null
         }
         Insert: {
+          attempts?: number | null
           created_at?: string | null
-          id?: never
+          expires_at?: string | null
+          id?: string
           phone_number: string
           verification_code: string
+          verified?: boolean | null
         }
         Update: {
+          attempts?: number | null
           created_at?: string | null
-          id?: never
+          expires_at?: string | null
+          id?: string
           phone_number?: string
           verification_code?: string
+          verified?: boolean | null
         }
         Relationships: []
       }
