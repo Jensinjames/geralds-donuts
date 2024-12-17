@@ -13,6 +13,8 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Webhook received:', req.method);
+    
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -20,6 +22,17 @@ serve(async (req) => {
 
     const payload = await req.json()
     console.log('Received webhook payload:', payload)
+
+    // Test endpoint with a GET request
+    if (req.method === 'GET') {
+      return new Response(
+        JSON.stringify({ message: 'Webhook endpoint is working!' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200 
+        }
+      )
+    }
 
     // Insert the conversation data into Supabase
     const { data, error } = await supabaseClient
@@ -31,7 +44,12 @@ serve(async (req) => {
         metadata: payload.metadata || {}
       })
 
-    if (error) throw error
+    if (error) {
+      console.error('Error inserting data:', error)
+      throw error
+    }
+
+    console.log('Successfully inserted conversation:', data)
 
     return new Response(
       JSON.stringify({ success: true, data }),
