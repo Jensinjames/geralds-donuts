@@ -27,7 +27,7 @@ export function ConversationHistory() {
       return data;
     },
     staleTime: 1000 * 60, // Consider data fresh for 1 minute
-    cacheTime: 1000 * 60 * 5, // Keep unused data in cache for 5 minutes
+    gcTime: 1000 * 60 * 5, // Keep unused data in cache for 5 minutes
   });
 
   useEffect(() => {
