@@ -1,30 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Activity } from "lucide-react";
+import { useActivities } from "@/hooks/useActivities";
 
 export function ActivityList() {
-  const { data: activities, isLoading, error } = useQuery({
-    queryKey: ['activities'],
-    queryFn: async () => {
-      console.log('Fetching activities...');
-      const { data, error } = await supabase
-        .from('Activity')
-        .select('*')
-        .order('Timestamp', { ascending: false })
-        .limit(10);
-      
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-      
-      console.log('Fetched activities:', data);
-      return data;
-    },
-    staleTime: 1000 * 60, // Consider data fresh for 1 minute
-    gcTime: 1000 * 60 * 5, // Keep unused data in cache for 5 minutes
-  });
+  const { data: activities, isLoading, error } = useActivities();
 
   if (error) {
     console.error('Query error:', error);

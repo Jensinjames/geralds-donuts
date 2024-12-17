@@ -137,7 +137,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_active_and_max_connections: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          active_connections: number
+          max_connections: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

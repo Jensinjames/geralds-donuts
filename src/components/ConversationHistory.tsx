@@ -1,42 +1,20 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useConversations } from "@/hooks/useConversations";
 
 export function ConversationHistory() {
   const { toast } = useToast();
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-
-  const { data: conversations, isLoading, error } = useQuery({
-    queryKey: ['conversations'],
-    queryFn: async () => {
-      console.log('Fetching conversations...');
-      const { data, error } = await supabase
-        .from('conversation_history')
-        .select('*')
-        .order('timestamp', { ascending: false });
-      
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-      
-      console.log('Fetched conversations:', data);
-      return data;
-    },
-    staleTime: 1000 * 60, // Consider data fresh for 1 minute
-    gcTime: 1000 * 60 * 5, // Keep unused data in cache for 5 minutes
-  });
+  const { data: conversations, isLoading, error } = useConversations();
 
   useEffect(() => {
-    // Clean up previous subscription if it exists
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
     }
 
-    // Create new subscription
     channelRef.current = supabase
       .channel('schema-db-changes')
       .on(

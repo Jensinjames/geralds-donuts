@@ -1,21 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
+import { useComments } from "@/hooks/useComments";
 
 export function Comments() {
-  const { data: comments, isLoading } = useQuery({
-    queryKey: ['comments'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('comments')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { data: comments, isLoading } = useComments();
 
   if (isLoading) {
     return (
