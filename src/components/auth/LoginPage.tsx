@@ -25,6 +25,23 @@ export function LoginPage() {
           appearance={{ theme: ThemeSupa }}
           theme="light"
           providers={[]}
+          redirectTo={`${window.location.origin}/dashboard`}
+          showLinks={true}
+          view="sign_in"
+          localization={{
+            variables: {
+              sign_up: {
+                email_label: 'Email',
+                password_label: 'Create a Password',
+                button_label: 'Sign Up',
+              },
+              sign_in: {
+                email_label: 'Email',
+                password_label: 'Your Password',
+                button_label: 'Sign In',
+              },
+            },
+          }}
         />
       </Card>
     </div>
