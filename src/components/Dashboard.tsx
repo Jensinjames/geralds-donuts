@@ -6,6 +6,7 @@ import { ActivityList } from './ActivityList';
 import { ConversationHistory } from './ConversationHistory';
 import { AnalyticsCards } from './AnalyticsCards';
 import { ApiEndpoints } from './ApiEndpoints';
+import { VoiceChat } from './VoiceChat';
 import { Link } from 'react-router-dom';
 
 export function Dashboard() {
@@ -27,6 +28,7 @@ export function Dashboard() {
         <TabsList>
           <TabsTrigger value="activity">Activity</TabsTrigger>
           <TabsTrigger value="conversations">Conversations</TabsTrigger>
+          <TabsTrigger value="voice">Voice Chat</TabsTrigger>
           <TabsTrigger value="comments">Comments</TabsTrigger>
           <TabsTrigger value="endpoints">API Endpoints</TabsTrigger>
         </TabsList>
@@ -37,6 +39,10 @@ export function Dashboard() {
 
         <TabsContent value="conversations">
           <ConversationHistory />
+        </TabsContent>
+
+        <TabsContent value="voice">
+          <VoiceChat />
         </TabsContent>
 
         <TabsContent value="comments">
