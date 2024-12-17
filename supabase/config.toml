@@ -1,1 +1,10 @@
 project_id = "pioxjdawfuxqqzitbqas"
+
+[functions.elevenlabs-webhook]
+verify_jwt = false
+
+[functions.get-elevenlabs-url]
+verify_jwt = false
+
+[functions.get-signed-url]
+verify_jwt = false
