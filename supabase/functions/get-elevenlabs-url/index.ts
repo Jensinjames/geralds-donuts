@@ -30,13 +30,21 @@ serve(async (req) => {
       }
     );
 
+    const responseText = await response.text();
+    console.log('ElevenLabs response:', responseText);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('ElevenLabs API error:', errorText);
-      throw new Error(`ElevenLabs API error: ${response.status} ${errorText}`);
+      throw new Error(`ElevenLabs API error: ${response.status} ${responseText}`);
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Failed to parse response:', e);
+      throw new Error('Invalid response from ElevenLabs API');
+    }
+
     console.log('Successfully obtained signed URL');
     
     return new Response(
