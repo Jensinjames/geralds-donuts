@@ -159,6 +159,13 @@ export type Database = {
           created_at: string
         }[]
       }
+      sms_authenticate_user: {
+        Args: {
+          phone_number: string
+          shortcode: string
+        }
+        Returns: string
+      }
       update_user_email: {
         Args: {
           user_id: number

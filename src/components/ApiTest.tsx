@@ -1,19 +1,47 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
 export const ApiTest = () => {
   const { toast } = useToast();
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id || null);
+    };
+    getUser();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id || null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const testWebhook = async () => {
+    if (!userId) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to test the API integration",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      // First, log the activity
+      // First, log the activity with the actual user ID
       const { error: activityError } = await supabase
         .from('Activity')
         .insert({
           ID: crypto.randomUUID(),
           Timestamp: new Date().toISOString(),
-          User: 'test-user',
+          User: userId,
           Action: 'TEST_WEBHOOK',
           Details: { test: true },
           Status: 'success',
@@ -56,7 +84,11 @@ export const ApiTest = () => {
   };
 
   return (
-    <Button onClick={testWebhook} variant="outline">
+    <Button 
+      onClick={testWebhook} 
+      variant="outline"
+      disabled={!userId}
+    >
       Test API Integration
     </Button>
   );
